@@ -79,9 +79,10 @@ class EarlyStopping:
 # Toy Dataset Class
 """
 - Label: Binary
-- Modality1: n(579) x d1 (116)
-- Modality2: n(579) x d2 (116)
+- Modality1: n(579) x d1 (90)
+- Modality2: n(579) x d2 (90)
 - Modality3: n(579) x d3 (54)
+- Modality4: n(579) x d4 (90)
 """
 class Toy_Dataset:
     def __init__(self, random_seed):
