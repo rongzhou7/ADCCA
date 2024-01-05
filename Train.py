@@ -1,13 +1,12 @@
 from tqdm.auto import tqdm
 from utils import *
-from SDGCCA import SDGCCA_4_M
+from ADCCA import ADCCA_4_M
 import torch.nn as nn
 
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 import numpy as np
 # import matplotlib.pyplot as plt
-
 
 import os
 import pandas as pd
@@ -60,8 +59,8 @@ def train_SDGCCA(hyper_dict):
                         early_stopping = EarlyStopping(patience=hyper_dict['patience'], delta=hyper_dict['delta'])
                         best_loss = np.Inf
 
-                        # Define SDGCCA with 3 modality
-                        model = SDGCCA_4_M(m1_embedding_list, m2_embedding_list, m3_embedding_list, m4_embedding_list, 3).to(
+                        # Define ADCCA with 4 modality
+                        model = ADCCA_4_M(m1_embedding_list, m2_embedding_list, m3_embedding_list, m4_embedding_list, 3).to(
                             hyper_dict['device'])
 
                         # Optimizer
@@ -121,7 +120,7 @@ def train_SDGCCA(hyper_dict):
                                     break
 
                         # # draw the loss figure
-                        # plt.figure()  # 设置图片信息 例如：plt.figure(num = 2,figsize=(640,480))
+                        # plt.figure()
                         # # plt.plot(epoch_cor_losses_int)
                         # # plt.plot(epoch_clf_losses_int)
                         #
@@ -173,13 +172,10 @@ def train_SDGCCA(hyper_dict):
                             'test_mcc': test_mcc
                         }
 
-                        # 将字典转换为DataFrame
                         output_list.append(output_dict)
 
-        # 将输出列表转换为DataFrame
         output_df = pd.DataFrame(output_list)
 
-        # 将DataFrame写入CSV文件
         # output_df.to_csv(f"resultAMmini/AMminicv{cv}.csv", index=False)
         # Find best K
         best_k = np.argmax(val_mcc_result_list)
