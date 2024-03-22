@@ -21,16 +21,7 @@ def self_attention(query, key, value, dropout=None, mask=None):
     d_k = query.size(-1)
     # Compute attention scores
     scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)  # Q,K相似度计算
-    # 判断是否要mask，注：mask的操作在QK之后，softmax之前
-    # if mask is not None:
-    #     """
-    #     scores.masked_fill默认是按照传入的mask中为1的元素所在的索引，
-    #     在scores中相同的的索引处替换为value，替换值为-1e9，即-(10^9)
-    #     """
-    #     # mask.cuda()
-    #     # 进行mask操作，由于参数mask==0，因此替换上述mask中为0的元素所在的索引
-    #
-    #   scores = scores.masked_fill(mask == 0, -1e9)
+    
 
     self_attn_softmax = F.softmax(scores, dim=-1)  # 进行softmax
     # # Apply dropout if provided
