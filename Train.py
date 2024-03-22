@@ -96,7 +96,7 @@ def train_SDGCCA(hyper_dict):
                             clf_mean = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
 
                             # clf_loss = lcor * cor_loss_o
-                            clf_loss = lcor * clf_mean + cor_loss_o
+                            clf_loss = clf_mean + lcor * cor_loss_o
 
                             # record the clf loss
                             epoch_clf_loss = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
