@@ -96,7 +96,7 @@ def train_SDGCCA(hyper_dict):
                             clf_mean = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
 
                             # clf_loss = lcor * cor_loss_o
-                            clf_loss = clf_mean
+                            clf_loss = lcor * clf_mean + cor_loss_o
 
                             # record the clf loss
                             epoch_clf_loss = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
@@ -197,7 +197,7 @@ if __name__ == '__main__':
                   'device': torch.device("cuda:2" if torch.cuda.is_available() else "cpu"),
                   'lr': [0.0001, 0.00001], 'reg': [0, 0.01, 0.001, 0.0001],
                   'patience': 30, 'embedding_size': [256, 64, 16], 'max_top_k': 10,
-                  'lcor': [0]}
+                  'lcor': [1, 0.5, 0.4, 0.3, 0.2, 0.1, 0.01, 0]}
                  # 1, 0.5, 0.4, 0.3, 0.2, 0.1, 0.01, 0
 
 
