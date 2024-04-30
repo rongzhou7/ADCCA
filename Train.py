@@ -15,7 +15,7 @@ import pandas as pd
 random_seed = 100
 set_seed(random_seed)
 # PATH = "./AttDGCCA.pt"
-def train_SDGCCA(hyper_dict):
+def train_ADCCA(hyper_dict):
     # Return List
     ensemble_list = {'ACC': [], 'F1': [], 'AUC': [], 'MCC': []}
     metric_list = ['ACC', 'F1', 'AUC', 'MCC']
@@ -60,7 +60,7 @@ def train_SDGCCA(hyper_dict):
                         best_loss = np.Inf
 
                         # Define ADCCA with 4 modality
-                        model = ADCCA_4_M(m1_embedding_list, m2_embedding_list, m3_embedding_list, m4_embedding_list, 3).to(
+                        model = ADCCA_4_M(m1_embedding_list, m2_embedding_list, m3_embedding_list, m4_embedding_list, top_k).to(
                             hyper_dict['device'])
 
                         # Optimizer
@@ -96,7 +96,7 @@ def train_SDGCCA(hyper_dict):
                             clf_mean = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
 
                             # clf_loss = lcor * cor_loss_o
-                            clf_loss = clf_mean + lcor * cor_loss_o
+                            clf_loss = clf_mean
 
                             # record the clf loss
                             epoch_clf_loss = clf_loss1 + clf_loss2 + clf_loss3 + clf_loss4
@@ -197,11 +197,11 @@ if __name__ == '__main__':
                   'device': torch.device("cuda:2" if torch.cuda.is_available() else "cpu"),
                   'lr': [0.0001, 0.00001], 'reg': [0, 0.01, 0.001, 0.0001],
                   'patience': 30, 'embedding_size': [256, 64, 16], 'max_top_k': 10,
-                  'lcor': [1, 0.5, 0.4, 0.3, 0.2, 0.1, 0.01, 0]}
+                  'lcor': [0]}
                  # 1, 0.5, 0.4, 0.3, 0.2, 0.1, 0.01, 0
 
 
-    ensemble_list, hyper = train_SDGCCA(hyper_dict)
+    ensemble_list, hyper = train_ADCCA(hyper_dict)
 
     # Check Performance
     performance_result = check_mean_std_performance(ensemble_list)
