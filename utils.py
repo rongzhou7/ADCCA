@@ -20,8 +20,8 @@ def calculate_metric(y_true, y_pred, y_pred_proba):
     FN = sum((y_true == 1) & (y_pred == 0))
 
     # Calculate Sensitivity (True Positive Rate, TPR) and Specificity (True Negative Rate, TNR)
-    sen = TP / (TP + FN)
-    spe = TN / (TN + FP)
+    # sen = TP / (TP + FN)
+    # spe = TN / (TN + FP)
 
     return acc, f1, auc, mcc
     #return acc, auc, sen, spe
