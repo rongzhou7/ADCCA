@@ -21,7 +21,16 @@ def self_attention(query, key, value, dropout=None, mask=None):
     d_k = query.size(-1)
     # Compute attention scores
     scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)  # Q,K相似度计算
-    
+    # 判断是否要mask，注：mask的操作在QK之后，softmax之前
+    # if mask is not None:
+    #     """
+    #     scores.masked_fill默认是按照传入的mask中为1的元素所在的索引，
+    #     在scores中相同的的索引处替换为value，替换值为-1e9，即-(10^9)
+    #     """
+    #     # mask.cuda()
+    #     # 进行mask操作，由于参数mask==0，因此替换上述mask中为0的元素所在的索引
+    #
+    #   scores = scores.masked_fill(mask == 0, -1e9)
 
     self_attn_softmax = F.softmax(scores, dim=-1)  # 进行softmax
     # # Apply dropout if provided
@@ -82,6 +91,23 @@ class ADCCA_4_M(nn.Module):
         self.model3.apply(initialization)
         self.model4.apply(initialization)
 
+        # Self-attention linear layers for each modality, with the output dimension m*_du3
+        self.W_Q1 = nn.Linear(m1_du3, m1_du3)
+        self.W_K1 = nn.Linear(m1_du3, m1_du3)
+        self.W_V1 = nn.Linear(m1_du3, m1_du3)
+
+        self.W_Q2 = nn.Linear(m2_du3, m2_du3)
+        self.W_K2 = nn.Linear(m2_du3, m2_du3)
+        self.W_V2 = nn.Linear(m2_du3, m2_du3)
+
+        self.W_Q3 = nn.Linear(m3_du2, m3_du2)
+        self.W_K3 = nn.Linear(m3_du2, m3_du2)
+        self.W_V3 = nn.Linear(m3_du2, m3_du2)
+
+        self.W_Q4 = nn.Linear(m4_du3, m4_du3)
+        self.W_K4 = nn.Linear(m4_du3, m4_du3)
+        self.W_V4 = nn.Linear(m4_du3, m4_du3)
+
         self.top_k = top_k
 
         # Projection matrix
@@ -96,10 +122,22 @@ class ADCCA_4_M(nn.Module):
         output2o = self.model2(x2)
         output3o = self.model3(x3)
         output4o = self.model4(x4)
-        output1, _ = self_attention(output1o, output1o, output1o, dropout=None, mask=None)
-        output2, _ = self_attention(output2o, output2o, output2o, dropout=None, mask=None)
-        output3, _ = self_attention(output3o, output3o, output3o, dropout=None, mask=None)
-        output4, _ = self_attention(output4o, output4o, output4o, dropout=None, mask=None)
+
+        # # quick validation version without trainable para
+        # output1, _ = self_attention(output1o, output1o, output1o, dropout=None, mask=None)
+        # output2, _ = self_attention(output2o, output2o, output2o, dropout=None, mask=None)
+        # output3, _ = self_attention(output3o, output3o, output3o, dropout=None, mask=None)
+        # output4, _ = self_attention(output4o, output4o, output4o, dropout=None, mask=None)
+
+        # trainable para version
+        q1, k1, v1 = self.W_Q1(output1o), self.W_K1(output1o), self.W_V1(output1o)
+        q2, k2, v2 = self.W_Q2(output2o), self.W_K2(output2o), self.W_V2(output2o)
+        q3, k3, v3 = self.W_Q3(output3o), self.W_K3(output3o), self.W_V3(output3o)
+        q4, k4, v4 = self.W_Q4(output4o), self.W_K4(output4o), self.W_V4(output4o)
+        output1, _ = self_attention(q1, k1, v1, dropout=None, mask=None)
+        output2, _ = self_attention(q2, k2, v2, dropout=None, mask=None)
+        output3, _ = self_attention(q3, k3, v3, dropout=None, mask=None)
+        output4, _ = self_attention(q4, k4, v4, dropout=None, mask=None)
 
         return output1, output2, output3, output4, output1o, output2o, output3o, output4o
 
